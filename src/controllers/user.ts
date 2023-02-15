@@ -4,9 +4,9 @@ import { StatusCodes } from 'http-status-codes';
 
 const createUser: RequestHandler = async (req, res) => {
   try {
-    const { name, email, phone, pin } = req.body as IUser;
+    const { name, phone, pin } = req.body as IUser;
 
-    await UserModel.findOne({ email })
+    await UserModel.findOne({ phone })
       .then(async (user) => {
         if (user) {
           res.status(StatusCodes.CONFLICT).json({
@@ -15,7 +15,6 @@ const createUser: RequestHandler = async (req, res) => {
         } else {
           const user = new UserModel({
             name,
-            email,
             phone,
           });
           user.encryptPin(pin);
@@ -50,9 +49,9 @@ const createUser: RequestHandler = async (req, res) => {
 
 const getUser: RequestHandler = async (req, res) => {
   try {
-    const { email, pin } = req.body as IUser;
+    const { phone, pin } = req.body as IUser;
 
-    await UserModel.findOne({ email })
+    await UserModel.findOne({ phone })
       .then((user) => {
         if (user) {
           user
@@ -98,9 +97,9 @@ const getUser: RequestHandler = async (req, res) => {
 
 const updateUser: RequestHandler = async (req, res) => {
   try {
-    const { email, pin, name, phone, oldPin } = req.body as IUser;
+    const { pin, name, phone, oldPin } = req.body as IUser;
 
-    await UserModel.findOne({ email }).then((user) => {
+    await UserModel.findOne({ phone }).then((user) => {
       if (user) {
         user.comparePin(oldPin as string).then((isMatch) => {
           if (isMatch) {
@@ -133,9 +132,9 @@ const updateUser: RequestHandler = async (req, res) => {
 
 const deleteUser: RequestHandler = async (req, res) => {
   try {
-    const { email, pin } = req.body as IUser;
+    const { phone, pin } = req.body as IUser;
 
-    UserModel.findOne({ email }).then((user) => {
+    UserModel.findOne({ phone }).then((user) => {
       if (user) {
         user.comparePin(pin).then((isMatch) => {
           if (isMatch) {
@@ -165,9 +164,9 @@ const deleteUser: RequestHandler = async (req, res) => {
 
 const resumeSession: RequestHandler = async (req, res) => {
   try {
-    const { email, token } = req.body as IUser;
+    const { phone, token } = req.body as IUser;
 
-    UserModel.findOne({ email }).then((user) => {
+    UserModel.findOne({ phone }).then((user) => {
       if (user) {
         user.verifyAuthToken(token).then((isMatch) => {
           if (isMatch) {

@@ -4,12 +4,13 @@ import jwt from 'jsonwebtoken';
 import { CONSTANTS } from '../utils/constants';
 
 export interface IUser {
+  _id?: any;
   name: string;
-  email: string;
   phone: string;
   pin: string;
   oldPin?: string;
-  currentBalance: number;
+  balance: number;
+  monthlyLimit: number;
   token: string;
 }
 
@@ -29,12 +30,6 @@ const userSchema = new Schema<IUser, TUserModel>(
       required: true,
       trim: true,
     },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
     phone: {
       type: String,
       default: '',
@@ -45,9 +40,13 @@ const userSchema = new Schema<IUser, TUserModel>(
       default: '',
       trim: true,
     },
-    currentBalance: {
+    balance: {
       type: Number,
       default: 0,
+    },
+    monthlyLimit: {
+      type: Number,
+      default: 100000,
     },
     token: {
       type: String,
