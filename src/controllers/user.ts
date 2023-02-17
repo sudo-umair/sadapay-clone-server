@@ -194,4 +194,4 @@ const resumeSession: RequestHandler = async (req, res) => {
   }
 };
 
-export { createUser, getUser, updateUser };
+export { createUser, getUser, updateUser, resumeSession, deleteUser };
