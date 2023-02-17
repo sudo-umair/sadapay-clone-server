@@ -19,6 +19,7 @@ export interface IUserDocument extends IUser, Document {
   comparePin: (pin: string) => Promise<boolean>;
   generateAuthToken: () => Promise<string>;
   verifyAuthToken: (token: string) => Promise<boolean>;
+  resetMonthlyLimits: () => Promise<void>;
 }
 
 export type TUserModel = Model<IUserDocument>;
@@ -88,6 +89,23 @@ userSchema.methods.verifyAuthToken = async function (token: string) {
     return true;
   }
   return false;
+};
+
+userSchema.methods.resetMonthlyLimits = async function () {
+  const dateToday = new Date();
+  if (dateToday.getDate() !== 1) {
+    return;
+  }
+  await UserModel.find()
+    .then((users) => {
+      users.forEach((user) => {
+        user.monthlyLimit = 100000;
+        user.save();
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 export const UserModel = model<IUserDocument, TUserModel>('User', userSchema);
