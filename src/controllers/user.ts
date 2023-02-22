@@ -2,6 +2,39 @@ import { RequestHandler } from 'express';
 import { IUser, UserModel } from '../models/user';
 import { StatusCodes } from 'http-status-codes';
 
+const checkUser: RequestHandler = async (req, res) => {
+  try {
+    const { searchText } = req.body as IUser;
+    console.log(searchText);
+    await UserModel.findOne({ phone: searchText })
+      .then((user) => {
+        if (user) {
+          res.status(StatusCodes.OK).json({
+            status: true,
+            message: 'User found',
+            user,
+          });
+        } else {
+          res.status(StatusCodes.OK).json({
+            status: false,
+            message: 'User not found',
+          });
+        }
+      })
+      .catch((error) => {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          message: 'Something went wrong',
+        });
+        console.error(error);
+      });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: 'Something went wrong',
+    });
+    console.error(error);
+  }
+};
+
 const createUser: RequestHandler = async (req, res) => {
   try {
     const { name, phone, pin } = req.body as IUser;
@@ -162,36 +195,4 @@ const deleteUser: RequestHandler = async (req, res) => {
   }
 };
 
-const resumeSession: RequestHandler = async (req, res) => {
-  try {
-    const { phone, token } = req.body as IUser;
-
-    UserModel.findOne({ phone }).then((user) => {
-      if (user) {
-        user.verifyAuthToken(token).then((isMatch) => {
-          if (isMatch) {
-            res.status(StatusCodes.OK).json({
-              message: 'Session resumed',
-              user,
-            });
-          } else {
-            res.status(StatusCodes.UNAUTHORIZED).json({
-              message: 'Incorrect token',
-            });
-          }
-        });
-      } else {
-        res.status(StatusCodes.NOT_FOUND).json({
-          message: 'User not found',
-        });
-      }
-    });
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: 'Something went wrong',
-    });
-    console.error(error);
-  }
-};
-
-export { createUser, getUser, updateUser, resumeSession, deleteUser };
+export { createUser, getUser, updateUser, deleteUser, checkUser };

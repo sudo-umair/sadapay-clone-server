@@ -4,14 +4,15 @@ import jwt from 'jsonwebtoken';
 import { CONSTANTS } from '../utils/constants';
 
 export interface IUser {
-  _id?: any;
   name: string;
   phone: string;
   pin: string;
-  oldPin?: string;
+  token: string;
   balance: number;
   monthlyLimit: number;
-  token: string;
+  _id?: any;
+  oldPin?: string;
+  searchText?: string;
 }
 
 export interface IUserDocument extends IUser, Document {
@@ -43,7 +44,7 @@ const userSchema = new Schema<IUser, TUserModel>(
     },
     balance: {
       type: Number,
-      default: 0,
+      default: 10000,
     },
     monthlyLimit: {
       type: Number,
