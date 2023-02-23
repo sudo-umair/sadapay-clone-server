@@ -9,10 +9,7 @@ export interface ITransaction {
     name: string;
     phone: string;
   };
-  to: {
-    name: string;
-    phone: string;
-  };
+  to: string;
 }
 
 export interface ITransactionDocument extends ITransaction, Document {
@@ -49,14 +46,8 @@ const transactionSchema = new Schema<ITransaction, TInteractionModel>(
       },
     },
     to: {
-      name: {
-        type: String,
-        required: true,
-      },
-      phone: {
-        type: String,
-        required: true,
-      },
+      type: String,
+      required: true,
     },
   },
   {
@@ -67,7 +58,7 @@ const transactionSchema = new Schema<ITransaction, TInteractionModel>(
 transactionSchema.methods.handleTransaction = async function () {
   const transaction = this as ITransactionDocument;
 
-  const receiver = await UserModel.findOne({ phone: transaction.to.phone });
+  const receiver = await UserModel.findOne({ phone: transaction.to });
   if (!receiver) {
     throw new Error('Receiver not found');
   }

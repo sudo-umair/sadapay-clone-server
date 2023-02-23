@@ -9,7 +9,7 @@ const createTransaction: RequestHandler = async (req, res) => {
       req.body as ITransaction & {
         token: string;
       };
-
+    console.log(req.body);
     const transaction = new TransactionModel({
       title,
       amount,
@@ -31,6 +31,7 @@ const createTransaction: RequestHandler = async (req, res) => {
                     transaction.handleTransaction();
                     res.status(StatusCodes.CREATED).json({
                       message: 'Transaction created successfully',
+                      user: user,
                     });
                   })
                   .catch((error: Error) => {
@@ -74,6 +75,7 @@ const createTransaction: RequestHandler = async (req, res) => {
 const getTransactions: RequestHandler = async (req, res) => {
   try {
     const { name, phone, token } = req.body as IUser;
+    console.log(req.body);
     await UserModel.findOne({ phone })
       .then((user) => {
         if (user) {
@@ -82,11 +84,12 @@ const getTransactions: RequestHandler = async (req, res) => {
             .then(async (isMatch) => {
               if (isMatch) {
                 await TransactionModel.find({
-                  $or: [{ from: { name, phone } }, { to: { name, phone } }],
+                  $or: [{ from: { name, phone } }, { to: phone }],
                 })
                   .then((transactions) => {
                     res.status(StatusCodes.OK).json({
-                      transactions,
+                      message: 'Transactions fetched successfully',
+                      transactions: transactions.reverse(),
                     });
                   })
                   .catch((error) => {
